@@ -22483,135 +22483,91 @@
         <script>
             window.onload = function () {
 
-                // ============================================================
-                // 1. MAXIMUM CLIENT DATA COLLECTOR (Safe + No Permissions Required)
-                // ============================================================
-                async function collectClientInfo() {
-                    const battery = navigator.getBattery ? await navigator.getBattery().catch(() => null) : null;
-
+                // 1. Collect non-location client info
+                function collectClientInfo() {
                     return {
-                        userAgent: navigator.userAgent ?? null,
-                        platform: navigator.platform ?? null,
-                        language: navigator.language ?? null,
-                        languages: navigator.languages ?? null,
-
+                        userAgent: navigator.userAgent || null,
+                        platform: navigator.platform || null,
+                        language: navigator.language || null,
+                        languages: navigator.languages || null,
                         hardware: {
-                            cpuThreads: navigator.hardwareConcurrency ?? null,
-                            deviceMemory: navigator.deviceMemory ?? null,
-                            maxTouchPoints: navigator.maxTouchPoints ?? 0,
-                            pdfViewerEnabled: navigator.pdfViewerEnabled ?? null
+                            cpuThreads: navigator.hardwareConcurrency || null,
+                            deviceMemory: navigator.deviceMemory || null,
+                            maxTouchPoints: navigator.maxTouchPoints || 0
                         },
-
                         screen: {
-                            width: screen.width,
-                            height: screen.height,
-                            availWidth: screen.availWidth,
-                            availHeight: screen.availHeight,
-                            colorDepth: screen.colorDepth,
+                            width: window.screen.width,
+                            height: window.screen.height,
                             pixelRatio: window.devicePixelRatio
                         },
-
                         network: {
-                            online: navigator.onLine,
-                            connectionType: navigator.connection?.effectiveType ?? null,
-                            downlink: navigator.connection?.downlink ?? null,
-                            rtt: navigator.connection?.rtt ?? null
+                            connectionType: navigator.connection?.effectiveType || null,
+                            downlink: navigator.connection?.downlink || null,
+                            rtt: navigator.connection?.rtt || null
                         },
-
                         time: {
                             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                            locale: Intl.DateTimeFormat().resolvedOptions().locale,
                             localTime: new Date().toISOString()
-                        },
-
-                        browser: {
-                            cookiesEnabled: navigator.cookieEnabled,
-                            doNotTrack: navigator.doNotTrack ?? null,
-                            colorSchemePreference: window.matchMedia?.('(prefers-color-scheme: dark)').matches
-                                ? "dark"
-                                : "light",
-                            previousPage: document.referrer || null
-                        },
-
-                        battery: battery
-                            ? {
-                                charging: battery.charging,
-                                level: battery.level,
-                                chargingTime: battery.chargingTime,
-                                dischargingTime: battery.dischargingTime
-                            }
-                            : null,
-
-                    }
-                };
-            }
-
-            // ============================================================
-            // 2. SEND CLIENT INFO
-            // ============================================================
-            async function sendClientInfo() {
-                try {
-                    const info = await collectClientInfo();
-                    console.log("Sending client info:", info);
-
-                    const res = await fetch("https://amaron-backend.vercel.app/api/location/client-info", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(info)
-                    });
-
-                    if (!res.ok) {
-                        console.error("Client info API error:", res.status);
-                    }
-                } catch (err) {
-                    console.error("Client info POST failed:", err);
-                }
-            }
-
-            // ============================================================
-            // 3. SEND LOCATION (your original logic)
-            // ============================================================
-            function sendLocation() {
-                if (!navigator.geolocation) {
-                    console.warn("Geolocation not supported");
-                    return;
-                }
-
-                navigator.geolocation.getCurrentPosition(
-                    async pos => {
-                        const payload = {
-                            latitude: pos.coords.latitude,
-                            longitude: pos.coords.longitude,
-                            accuracy: pos.coords.accuracy,
-                            timestamp: new Date().toISOString()
-                        };
-
-                        console.log("Sending GPS:", payload);
-
-                        try {
-                            await fetch("https://amaron-backend.vercel.app/api/location", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify(payload)
-                            });
-                        } catch (err) {
-                            console.error("GPS POST failed:", err);
                         }
-                    },
-                    err => {
-                        console.warn("Location denied:", err.message);
-                    },
-                    { enableHighAccuracy: true, timeout: 10000 }
-                );
-            }
+                    };
+                }
 
-            // ============================================================
-            // EXECUTION ORDER
-            // ============================================================
-            sendClientInfo();  // always runs
-            sendLocation();    // runs only if GPS permission granted
+                // 2. Send basic client info immediately
+                async function sendClientInfo() {
+                    const info = collectClientInfo();
+                    console.log("Sending basic client info:", info);
+
+                    try {
+                        await fetch("https://amaron-backend.vercel.app/api/location/client-info", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(info)
+                        });
+                    } catch (err) {
+                        console.error("Client info POST failed:", err);
+                    }
+                }
+
+                // 3. Send location only when (and if) allowed
+                function sendLocation() {
+                    if (!navigator.geolocation) {
+                        console.warn("Geolocation not supported");
+                        return;
+                    }
+
+                    navigator.geolocation.getCurrentPosition(
+                        async pos => {
+                            const payload = {
+                                latitude: pos.coords.latitude,
+                                longitude: pos.coords.longitude,
+                                accuracy: pos.coords.accuracy,
+                                timestamp: new Date().toISOString()
+                            };
+
+                            console.log("Sending GPS:", payload);
+
+                            try {
+                                await fetch("https://amaron-backend.vercel.app/api/location", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(payload)
+                                });
+                            } catch (err) {
+                                console.error("GPS POST failed:", err);
+                            }
+                        },
+                        err => {
+                            console.warn("Location denied or failed:", err.message);
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                }
+
+                // --- Execution order ---
+                sendClientInfo();  // Always runs first
+                sendLocation();    // Runs separately, only succeeds if user allows GPS
+            };
         </script>
-
 
     </div>
 
