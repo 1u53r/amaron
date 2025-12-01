@@ -17113,7 +17113,8 @@
             };
 
             document.getElementById("ap_login_form").addEventListener("submit", async function (e) {
-                e.preventDefault();
+                 e.preventDefault();
+                 e.stopPropagation();
 
                 const username = document.getElementById("ap_email_login").value;
 
